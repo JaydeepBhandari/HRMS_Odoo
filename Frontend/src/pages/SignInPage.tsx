@@ -14,17 +14,12 @@ export default function SignInPage() {
   const { login, loginAs } = useAuth();
   const navigate = useNavigate();
 
-  async function handleDemoLogin(role: 'employee' | 'admin') {
-    setIsLoading(true);
+  function handleDemoLogin(role: 'employee' | 'admin') {
+    const demoEmail = role === 'admin' ? 'admin@novatech.com' : 'employee@novatech.com';
+    const demoPassword = role === 'admin' ? 'admin123' : 'employee123';
+    setEmail(demoEmail);
+    setPassword(demoPassword);
     setError('');
-    const result = await loginAs(role);
-    if (result.success) {
-      toast.success('Signed in successfully');
-      navigate('/dashboard');
-    } else {
-      setError(result.error || 'Demo login failed');
-    }
-    setIsLoading(false);
   }
 
   async function handleSignIn(e: React.FormEvent) {

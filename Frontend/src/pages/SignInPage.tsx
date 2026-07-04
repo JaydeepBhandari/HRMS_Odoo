@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { employees } from '../data/mockData';
 import { User, Shield, Eye, EyeOff, AlertTriangle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Logo } from '../components/ui/Logo';
@@ -12,21 +11,20 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { switchUser } = useAuth();
+  const { login, loginAs } = useAuth();
   const navigate = useNavigate();
 
-  function loginAs(role: 'employee' | 'admin') {
-    const user = role === 'admin'
-      ? employees.find(e => e.role === 'admin')
-      : employees.find(e => e.role === 'employee');
-
-    if (!user) {
-      console.error('No mock user found for role:', role);
-      return;
+  async function handleDemoLogin(role: 'employee' | 'admin') {
+    setIsLoading(true);
+    setError('');
+    const result = await loginAs(role);
+    if (result.success) {
+      toast.success('Signed in successfully');
+      navigate('/dashboard');
+    } else {
+      setError(result.error || 'Demo login failed');
     }
-
-    switchUser(user.id);
-    navigate('/dashboard');
+    setIsLoading(false);
   }
 
   async function handleSignIn(e: React.FormEvent) {
@@ -40,37 +38,20 @@ export default function SignInPage() {
 
     setIsLoading(true);
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-
-    // Find user in mock data by email (case-insensitive)
-    const user = employees.find(
-      e => e.email.toLowerCase() === email.toLowerCase() || e.loginId.toLowerCase() === email.toLowerCase()
-    );
-
-    if (!user) {
-      setError('No account found with this email.');
-      setIsLoading(false);
-      return;
+    const result = await login(email, password);
+    if (result.success) {
+      toast.success('Signed in successfully');
+      navigate('/dashboard');
+    } else {
+      setError(result.error || 'Login failed');
     }
-
-    // Password check: for mock, any password >= 6 chars for known email
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      setIsLoading(false);
-      return;
-    }
-
-    switchUser(user.id);
-    toast.success('Signed in successfully');
-    navigate('/dashboard');
+    setIsLoading(false);
   }
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-[420px] bg-[#1a1a1a] border border-white/10 rounded-2xl p-8 shadow-2xl animate-fade-in">
         
-        {/* Logo & Header */}
         <div className="flex flex-col items-center mb-8">
           <div className="mb-6">
             <Logo />
@@ -79,33 +60,29 @@ export default function SignInPage() {
           <p className="text-sm text-surface-400 mt-1.5">Sign in to your HRMS account</p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSignIn} className="space-y-4">
+        <form onSubmit={handleSignIn} className="space-y-5">
           <div>
-            <label className="block text-[13px] font-medium text-surface-400 mb-1.5">
+            <label htmlFor="email" className="text-xs font-medium text-surface-300 uppercase tracking-wider">
               Login ID or Email
             </label>
             <input
+              id="email"
               type="text"
               value={email}
               onChange={e => { setEmail(e.target.value); setError(''); }}
               disabled={isLoading}
-              className="w-full h-10 bg-surface-900 border border-white/15 rounded-lg px-3 text-sm text-white focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 disabled:opacity-50 transition-colors"
-              placeholder="e.g. employee@novatech.com"
+              className="w-full h-10 bg-surface-900 border border-white/15 rounded-lg px-3 text-sm text-white focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 disabled:opacity-50 transition-colors mt-1.5"
+              placeholder="you@company.com"
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-[13px] font-medium text-surface-400">
-                Password
-              </label>
-              <a href="#" className="text-[13px] text-accent-400 hover:text-accent-300 font-medium transition-colors">
-                Forgot password?
-              </a>
-            </div>
-            <div className="relative">
+            <label htmlFor="password" className="text-xs font-medium text-surface-300 uppercase tracking-wider">
+              Password
+            </label>
+            <div className="relative mt-1.5">
               <input
+                id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(''); }}
@@ -140,13 +117,12 @@ export default function SignInPage() {
           </button>
         </form>
 
-        {/* Demo Quick Access */}
         <div className="mt-8 border-t border-white/10 pt-6">
           <p className="text-xs text-center text-surface-400 mb-4">Quick access for demo</p>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => loginAs('employee')}
+              onClick={() => handleDemoLogin('employee')}
               disabled={isLoading}
               className="h-10 border border-surface-600 hover:border-surface-500 text-white font-medium text-sm rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
@@ -155,7 +131,7 @@ export default function SignInPage() {
             </button>
             <button
               type="button"
-              onClick={() => loginAs('admin')}
+              onClick={() => handleDemoLogin('admin')}
               disabled={isLoading}
               className="h-10 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
@@ -169,7 +145,7 @@ export default function SignInPage() {
       <div className="mt-8 text-center text-sm text-surface-400">
         New company?{' '}
         <Link to="/sign-up" className="text-accent-400 hover:text-accent-300 font-medium transition-colors">
-          Set up your account →
+          Register here
         </Link>
       </div>
     </div>

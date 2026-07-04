@@ -90,7 +90,7 @@ export function getEmployeeStatus(employeeId: string): 'present' | 'on-leave' | 
   const record = attendanceRecords.find(
     r => r.employeeId === employeeId && r.date === today
   );
-  if (record && record.status === 'present') {
+  if (record && record.status === 'present' && !record.checkOut) {
     return 'present';
   }
 

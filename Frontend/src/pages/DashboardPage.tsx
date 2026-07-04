@@ -60,6 +60,11 @@ function EmployeeDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <div>
+        <h1 className="text-2xl font-bold text-white">Welcome back, {currentUser!.employee.firstName}!</h1>
+        <p className="text-surface-400 mt-1">Here is what is happening today.</p>
+      </div>
+
       <CheckInOutPanel />
 
       {/* Employee Card Grid */}
@@ -125,6 +130,10 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <div>
+        <h1 className="text-2xl font-bold text-white">Welcome back, {currentUser!.employee.firstName}!</h1>
+        <p className="text-surface-400 mt-1">Here is your administrator overview.</p>
+      </div>
       
       <CheckInOutPanel />
 

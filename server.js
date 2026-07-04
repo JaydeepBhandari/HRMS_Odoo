@@ -1,3 +1,6 @@
+const cors = require('cors');
+app.use(cors()); // This allows your frontend to make API requests!
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');

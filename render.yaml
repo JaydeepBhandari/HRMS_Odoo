@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: hrms-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        value: https://hrms-odoo-ruby.vercel.app
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        value: memory # WARNING: Change this to a real MongoDB Atlas URI in the Render dashboard for persistent data!

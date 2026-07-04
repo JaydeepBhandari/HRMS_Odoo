@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getEmployees, searchEmployees } from '../services/employeeService';
 import { getEmployeeStatus, checkIn, checkOut, getAllEmployeesTodayAttendance } from '../services/attendanceService';
-import { getPendingLeaveRequests, getActivities } from '../services/leaveService';
+import { getActivities } from '../services/leaveService';
 import { formatDate } from '../utils/formatters';
 import type { Employee, EmployeeStatusDot } from '../types';
 import { Users, UserCheck, CalendarOff, UserX, Clock, Search } from 'lucide-react';
@@ -109,7 +109,6 @@ function AdminDashboard() {
     [search]
   );
   
-  const pendingLeaves = getPendingLeaveRequests();
   const todayAttendance = getAllEmployeesTodayAttendance();
   const presentCount = todayAttendance.filter(a => a.record?.status === 'present').length;
   const onLeaveCount = todayAttendance.filter(a => a.record?.status === 'leave').length;

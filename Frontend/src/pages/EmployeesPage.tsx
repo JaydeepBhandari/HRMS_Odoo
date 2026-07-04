@@ -2,16 +2,14 @@
  * Employees Page — Directory/list view of all employees
  * Searchable, filterable by department
  */
-
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { getEmployees, searchEmployees, getDepartments } from '../services/employeeService';
 import { getEmployeeStatus } from '../services/attendanceService';
 
 export default function EmployeesPage() {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+
   const [search, setSearch] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const departments = getDepartments();

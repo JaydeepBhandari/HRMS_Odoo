@@ -3,7 +3,7 @@
  */
 
 import { attendanceRecords, employees } from '../data/mockData';
-import type { AttendanceRecord, AttendanceStatus } from '../types';
+import type { AttendanceRecord } from '../types';
 import { getLeaveRequests } from './leaveService';
 
 export function getAttendanceByDate(date: string): AttendanceRecord[] {

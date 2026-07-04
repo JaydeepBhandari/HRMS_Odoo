@@ -226,7 +226,7 @@ function PersonalInfoTab({ employee, formData, setFormData, isEditing, limitedEd
   );
 }
 
-function PrivateInfoTab({ employee, formData, setFormData, isEditing, limitedEdit, canEdit }: TabProps) {
+function PrivateInfoTab({ formData, setFormData, isEditing, limitedEdit, canEdit }: TabProps) {
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -236,8 +236,8 @@ function PrivateInfoTab({ employee, formData, setFormData, isEditing, limitedEdi
             Personal Details
           </h3>
           <InfoField label="Date of birth" value={formatDate(formData.dateOfBirth, 'short')} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, dateOfBirth: v }))} type="date" />
-          <InfoField label="Gender" value={formData.gender} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, gender: v }))} />
-          <InfoField label="Marital status" value={formData.maritalStatus} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, maritalStatus: v }))} />
+          <InfoField label="Gender" value={formData.gender} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, gender: v as any }))} />
+          <InfoField label="Marital status" value={formData.maritalStatus} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, maritalStatus: v as any }))} />
           <InfoField label="Blood group" value={formData.bloodGroup} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, bloodGroup: v }))} />
           <InfoField label="Date of joining" value={formatDate(formData.dateOfJoining, 'short')} isEditing={isEditing && !limitedEdit} onChange={v => setFormData((p) => ({ ...p, dateOfJoining: v }))} type="date" />
         </div>
@@ -442,7 +442,7 @@ function SalaryInfoAdminTab({ employeeId }: { employeeId: string }) {
               <td className="py-3 px-4 text-right font-mono font-bold text-white flex justify-end items-center gap-2">
                 {formatCurrency(totalComputed)}
                 {!editing && matchesTotal && <CheckCircle2 size={16} className="text-[#22c55e]" />}
-                {!editing && !matchesTotal && <AlertCircle size={16} className="text-[#ef4444]" title="Exceeds total wage" />}
+                {!editing && !matchesTotal && <span title="Exceeds total wage"><AlertCircle size={16} className="text-[#ef4444]" /></span>}
               </td>
               {editing && <td></td>}
             </tr>

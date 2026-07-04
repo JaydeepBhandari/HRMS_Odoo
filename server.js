@@ -30,19 +30,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/employees', employeeRoutes);
-app.use('/api/leaves', leaveRoutes);
-app.use('/api/attendance', attendanceRoutes);
-app.use('/api/salary', salaryRoutes);
-
-app.get('/health', (req, res) => {
-  res.status(200).json({ success: true, message: 'Server is running smoothly' });
-});
-
-const PORT = process.env.PORT || 5000;
-
-async function startServer() {
+// Database connection logic for Serverless environments (like Vercel)
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected) return;
   try {
     let mongoUri = process.env.MONGO_URI;
 
@@ -54,6 +45,7 @@ async function startServer() {
     }
 
     await mongoose.connect(mongoUri);
+    isConnected = true;
     console.log('MongoDB Connected Successfully');
 
     const User = require('./models/User');
@@ -67,14 +59,34 @@ async function startServer() {
         console.error('Seed failed:', err);
       }
     }
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
   } catch (err) {
     console.error('Database connection error:', err.message);
-    process.exit(1);
   }
+};
+
+// Middleware to ensure DB connects before handling requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/leaves', leaveRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/salary', salaryRoutes);
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ success: true, message: 'Server is running smoothly' });
+});
+
+// Start server normally for local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 }
 
-startServer();
+// Export the app for Vercel Serverless
+module.exports = app;

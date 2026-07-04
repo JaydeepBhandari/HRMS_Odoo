@@ -3,10 +3,10 @@
  * Includes a dev-only role switcher for demo/testing
  */
 
-import React, { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { AuthUser } from '../types';
 import { signIn as authSignIn, getCurrentUser } from '../services/authService';
-import { employees, companies } from '../data/mockData';
+import { employees } from '../data/mockData';
 
 interface AuthContextType {
   currentUser: AuthUser | null;

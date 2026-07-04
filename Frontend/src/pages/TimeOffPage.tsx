@@ -13,7 +13,7 @@ import {
 import { getEmployee, getEmployees } from '../services/employeeService';
 import type { LeaveRequest, LeaveType } from '../types';
 import { LEAVE_TYPE_LABELS } from '../types';
-import { Calendar as CalendarIcon, Clock, CheckCircle2, XCircle, Plus, Search, MessageSquare, ChevronLeft, ChevronRight, X, Check, FileText } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Plus, Search, MessageSquare, ChevronLeft, ChevronRight, X, Check, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { BalanceCard } from '../components/ui/BalanceCard';
@@ -60,6 +60,7 @@ function AdminTimeOffTab() {
   const [actionType, setActionType] = useState<'approve'|'reject' | null>(null);
   const [, setForceUpdate] = useState(0);
 
+  const employees = getEmployees();
   const allRequests = getLeaveRequests();
   const filteredRequests = useMemo(() => {
     if (!search) return allRequests;
@@ -69,7 +70,7 @@ function AdminTimeOffTab() {
       return emp && (
         emp.firstName.toLowerCase().includes(q) ||
         emp.lastName.toLowerCase().includes(q) ||
-        r.leaveType.includes(q)
+        r.leaveType.toLowerCase().includes(q)
       );
     });
   }, [allRequests, search]);
@@ -102,7 +103,6 @@ function AdminTimeOffTab() {
   };
 
   // Balance summary
-  const employees = getEmployees();
   const totalPTO = employees.reduce((sum, e) => sum + getLeaveBalance(e.id, 'paid-time-off').available, 0);
   const totalSick = employees.reduce((sum, e) => sum + getLeaveBalance(e.id, 'sick-leave').available, 0);
   const pendingRequests = getPendingLeaveRequests();
@@ -450,7 +450,6 @@ function EmployeeTimeOff() {
         <LeaveRequestModal
           onSubmit={handleSubmit}
           onClose={() => setShowForm(false)}
-          employeeName={`${currentUser!.employee.firstName} ${currentUser!.employee.lastName}`}
         />
       )}
     </div>
@@ -458,10 +457,9 @@ function EmployeeTimeOff() {
 }
 
 
-function LeaveRequestModal({ onSubmit, onClose, employeeName }: {
+function LeaveRequestModal({ onSubmit, onClose }: {
   onSubmit: (data: any) => void;
   onClose: () => void;
-  employeeName: string;
 }) {
   const [leaveType, setLeaveType] = useState<LeaveType>('paid-time-off');
   const [startDate, setStartDate] = useState('');

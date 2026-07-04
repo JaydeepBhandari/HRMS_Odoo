@@ -2,16 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getAttendanceByDate,
-  getAttendanceByEmployee,
   getAttendanceByEmployeeAndMonth,
   getMonthSummary,
   checkIn,
 } from '../services/attendanceService';
 import { getEmployees } from '../services/employeeService';
-import type { AttendanceRecord } from '../types';
-import { Search, ChevronLeft, ChevronRight, Clock, MapPin, UserCheck, CalendarOff, AlertCircle, Calendar as CalendarIcon, CheckCircle2, UserX } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Clock, CalendarIcon, CheckCircle2, ArrowRight, CalendarOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { StatusBadge } from '../components/ui/StatusBadge';
+
 
 export default function AttendancePage() {
   const { isAdmin } = useAuth();

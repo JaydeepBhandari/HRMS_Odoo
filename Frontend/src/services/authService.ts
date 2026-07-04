@@ -72,6 +72,11 @@ export async function signIn(loginIdOrEmail: string, password: string): Promise<
       const employee = backendUserToEmployee(result.user);
       const company = companies[0] || { id: 'comp-1', code: 'NT', name: 'NovaTech Solutions' };
 
+      // Ensure the logged-in user appears in the local directory mock list
+      if (!employees.find(e => e.email === employee.email)) {
+        employees.push(employee);
+      }
+
       const authUser: AuthUser = {
         employee,
         company,
@@ -118,6 +123,13 @@ export async function signUp(data: {
 
     if (result.success && result.token) {
       localStorage.setItem('hrms_access_token', result.token);
+
+      // Ensure newly registered user appears in the local directory mock list
+      const employee = backendUserToEmployee({ ...result.user, department: 'Management', designation: 'Administrator' });
+      if (!employees.find(e => e.email === employee.email)) {
+        employees.push(employee);
+      }
+
       return {
         success: true,
         loginId: data.email,

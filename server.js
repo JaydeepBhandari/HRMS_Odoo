@@ -49,9 +49,9 @@ const connectDB = async () => {
     console.log('MongoDB Connected Successfully');
 
     const User = require('./models/User');
-    const userCount = await User.countDocuments();
-    if (userCount === 0) {
-      console.log('Database is empty. Running seed...');
+    const adminExists = await User.findOne({ email: 'admin@novatech.com' });
+    if (!adminExists) {
+      console.log('Demo admin not found. Running seed...');
       try {
         const seed = require('./seed_func');
         await seed();

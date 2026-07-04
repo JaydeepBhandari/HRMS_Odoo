@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, DevRoleSwitcher } from './contexts/AuthContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
@@ -14,7 +14,7 @@ import TimeOffPage from './pages/TimeOffPage';
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           {/* Public routes */}
           <Route path="/sign-in" element={<SignInPage />} />
@@ -43,7 +43,7 @@ export default function App() {
 
         {/* Dev role switcher (always visible when authenticated) */}
         <DevRoleSwitcher />
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 }

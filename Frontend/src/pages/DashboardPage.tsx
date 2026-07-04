@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getEmployees, searchEmployees } from '../services/employeeService';
-import { getEmployeeStatus, checkIn, checkOut, getAllEmployeesTodayAttendance, syncCheckIn, syncCheckOut, fetchTodayAttendanceForAdmin } from '../services/attendanceService';
+import { getEmployeeStatus, getAllEmployeesTodayAttendance, syncCheckIn, syncCheckOut, fetchTodayAttendanceForAdmin } from '../services/attendanceService';
 import { getActivities } from '../services/leaveService';
 import { formatDate } from '../utils/formatters';
 import type { Employee, EmployeeStatusDot } from '../types';
@@ -113,10 +113,11 @@ function EmployeeDashboard() {
 }
 
 
-function AdminDashboard({ key }: { key?: string }) {
+function AdminDashboard() {
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [force, setForce] = useState(0);
+  const [, setForce] = useState(0);
 
   useEffect(() => {
     fetchTodayAttendanceForAdmin().then(() => setForce(f => f + 1));

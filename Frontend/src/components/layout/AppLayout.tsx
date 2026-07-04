@@ -35,7 +35,7 @@ export default function AppLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [dummy, setDummy] = useState(0);
+  const [, setDummy] = useState(0);
 
   // Close dropdown on outside click
   useEffect(() => {

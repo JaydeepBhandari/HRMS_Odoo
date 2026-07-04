@@ -11,7 +11,7 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, loginAs } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   function handleDemoLogin(role: 'employee' | 'admin') {

@@ -116,16 +116,16 @@ export async function signUp(data: {
       name: `${data.firstName} ${data.lastName}`,
       email: data.email,
       password: data.password,
-      role: 'Admin',
-      department: 'Management',
-      designation: 'Administrator',
+      role: 'Employee',
+      department: 'General',
+      designation: 'Employee',
     });
 
     if (result.success && result.token) {
       localStorage.setItem('hrms_access_token', result.token);
 
       // Ensure newly registered user appears in the local directory mock list
-      const employee = backendUserToEmployee({ ...result.user, department: 'Management', designation: 'Administrator' });
+      const employee = backendUserToEmployee({ ...result.user, department: 'General', designation: 'Employee' });
       if (!employees.find(e => e.email === employee.email)) {
         employees.push(employee);
       }

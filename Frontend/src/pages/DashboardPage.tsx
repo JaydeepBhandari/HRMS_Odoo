@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getEmployees, searchEmployees } from '../services/employeeService';
-import { getEmployeeStatus, checkIn, checkOut, getAllEmployeesTodayAttendance } from '../services/attendanceService';
+import { getEmployeeStatus, checkIn, checkOut, getAllEmployeesTodayAttendance, syncCheckIn, syncCheckOut, fetchTodayAttendanceForAdmin } from '../services/attendanceService';
 import { getActivities } from '../services/leaveService';
 import { formatDate } from '../utils/formatters';
 import type { Employee, EmployeeStatusDot } from '../types';
@@ -113,9 +113,26 @@ function EmployeeDashboard() {
 }
 
 
-function AdminDashboard() {
+function AdminDashboard({ key }: { key?: string }) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [force, setForce] = useState(0);
+
+  useEffect(() => {
+    fetchTodayAttendanceForAdmin().then(() => setForce(f => f + 1));
+    const interval = setInterval(() => {
+      fetchTodayAttendanceForAdmin().then(() => setForce(f => f + 1));
+    }, 10000); // sync every 10 seconds
+    
+    const handleUpdate = () => {
+      fetchTodayAttendanceForAdmin().then(() => setForce(f => f + 1));
+    };
+    window.addEventListener('attendance-updated', handleUpdate);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('attendance-updated', handleUpdate);
+    };
+  }, []);
 
   const allEmployees = useMemo(() =>
     search ? searchEmployees(search) : getEmployees(),
@@ -214,15 +231,15 @@ function CheckInOutPanel() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleCheckIn = () => {
-    checkIn(currentUser!.employee.id);
+  const handleCheckIn = async () => {
+    await syncCheckIn(currentUser!.employee.id);
     setCheckedIn(true);
     window.dispatchEvent(new Event('attendance-updated'));
     toast.success('Checked in successfully');
   };
 
-  const handleCheckOut = () => {
-    checkOut(currentUser!.employee.id);
+  const handleCheckOut = async () => {
+    await syncCheckOut(currentUser!.employee.id);
     setCheckedOut(true);
     window.dispatchEvent(new Event('attendance-updated'));
     toast.success('Checked out successfully');

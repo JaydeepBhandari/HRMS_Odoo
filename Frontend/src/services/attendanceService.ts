@@ -5,6 +5,7 @@
 import { attendanceRecords, employees } from '../data/mockData';
 import type { AttendanceRecord } from '../types';
 import { getLeaveRequests } from './leaveService';
+import { api } from './apiClient';
 
 export function getAttendanceByDate(date: string): AttendanceRecord[] {
   return attendanceRecords.filter(r => r.date === date);
@@ -142,4 +143,54 @@ export function getAllEmployeesTodayAttendance(): Array<{
     employee: emp,
     record: attendanceRecords.find(r => r.employeeId === emp.id && r.date === today),
   }));
+}
+
+export async function syncCheckIn(employeeId: string): Promise<void> {
+  checkIn(employeeId); // updates local mock array instantly
+  try {
+    await api.post('/attendance/check-in');
+  } catch (err) {
+    console.error('Failed to sync check-in', err);
+  }
+}
+
+export async function syncCheckOut(employeeId: string): Promise<void> {
+  checkOut(employeeId);
+  try {
+    await api.post('/attendance/check-out');
+  } catch (err) {
+    console.error('Failed to sync check-out', err);
+  }
+}
+
+export async function fetchTodayAttendanceForAdmin(): Promise<void> {
+  try {
+    const res = await api.get<{success: boolean, data: any[]}>('/attendance/today');
+    if (res && res.success && res.data) {
+      const today = new Date().toISOString().split('T')[0];
+      for (const record of res.data) {
+        const empId = typeof record.employee === 'object' ? record.employee._id : record.employee;
+        let local = attendanceRecords.find(r => r.employeeId === empId && r.date === today);
+        if (!local) {
+          local = {
+            id: record._id,
+            employeeId: empId,
+            date: today,
+            status: record.status ? record.status.toLowerCase() as any : 'absent',
+            checkIn: record.checkIn,
+            checkOut: record.checkOut,
+          };
+          attendanceRecords.push(local);
+        } else {
+          local.checkIn = record.checkIn;
+          local.checkOut = record.checkOut;
+          if (record.status) {
+            local.status = record.status.toLowerCase() as any;
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch admin attendance', err);
+  }
 }

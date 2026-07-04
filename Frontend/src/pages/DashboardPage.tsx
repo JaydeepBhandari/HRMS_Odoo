@@ -39,8 +39,16 @@ function getAvatarColor(name: string) {
 
 export default function DashboardPage() {
   const { currentUser, isAdmin } = useAuth();
+  const [dummy, setDummy] = useState(0);
+
+  useEffect(() => {
+    const handleUpdate = () => setDummy(d => d + 1);
+    window.addEventListener('attendance-updated', handleUpdate);
+    return () => window.removeEventListener('attendance-updated', handleUpdate);
+  }, []);
+
   if (!currentUser) return null;
-  return isAdmin ? <AdminDashboard /> : <EmployeeDashboard />;
+  return isAdmin ? <AdminDashboard key={`admin-${dummy}`} /> : <EmployeeDashboard key={`emp-${dummy}`} />;
 }
 
 
@@ -200,12 +208,14 @@ function CheckInOutPanel() {
   const handleCheckIn = () => {
     checkIn(currentUser!.employee.id);
     setCheckedIn(true);
+    window.dispatchEvent(new Event('attendance-updated'));
     toast.success('Checked in successfully');
   };
 
   const handleCheckOut = () => {
     checkOut(currentUser!.employee.id);
     setCheckedOut(true);
+    window.dispatchEvent(new Event('attendance-updated'));
     toast.success('Checked out successfully');
   };
 

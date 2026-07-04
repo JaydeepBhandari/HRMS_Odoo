@@ -35,6 +35,8 @@ export default function AppLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [dummy, setDummy] = useState(0);
+
   // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -43,7 +45,15 @@ export default function AppLayout() {
       }
     }
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    
+    // Listen for check-in/out to update header color
+    const handleUpdate = () => setDummy(d => d + 1);
+    window.addEventListener('attendance-updated', handleUpdate);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      window.removeEventListener('attendance-updated', handleUpdate);
+    };
   }, []);
 
   if (!currentUser) return null;
